@@ -13,10 +13,9 @@ std::vector<int> clientSockets;
 std::mutex clientsMutex;
 
 void recv_func(int client_socket, int idx) {
-	const int BUFFER_SIZE = 1024;
-	char recv_buff[BUFFER_SIZE];
+	char recv_buff[config::BUFFER_SIZE];
 	while (true) {
-		memset(recv_buff, 0, BUFFER_SIZE);
+		memset(recv_buff, 0, config::BUFFER_SIZE);
 		int r = recv(client_socket, recv_buff, sizeof(recv_buff), 0);
 		if (r > 0) {
 			printf("Client %d -----> Server : %s\n", idx, recv_buff);
@@ -55,8 +54,8 @@ int main() {
 	}
 
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_addr.s_addr = inet_addr(SERVER_IP);
-	server_addr.sin_port = htons(PORT);
+	server_addr.sin_addr.s_addr = inet_addr(config::SERVER_IP);
+	server_addr.sin_port = htons(config::PORT);
 
 	if (bind(server_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
 		perror("bind");
@@ -70,7 +69,7 @@ int main() {
 		exit(EXIT_FAILURE);
 	}
 
-	std::cout << "Server listening on " << SERVER_IP << ":" << PORT << std::endl;
+	std::cout << "Server listening on " << config::SERVER_IP << ":" << config::PORT << std::endl;
 
 	while (true) {
 		struct sockaddr_in client_addr;
