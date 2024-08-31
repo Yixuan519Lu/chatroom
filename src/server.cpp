@@ -43,57 +43,57 @@ void recv_func(int client_socket, int idx) {
 		close(client_socket);
 		clientSockets.erase(clientSockets.begin() + idx);
 	}
-	int main() {
-		int server_socket;
-		struct sockaddr_in server_addr;
+}
+int main() {
+	int server_socket;
+	struct sockaddr_in server_addr;
 
-		server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		if (server_socket == -1) {
-			perror("socket");
-			exit(EXIT_FAILURE);
-		}
-
-		server_addr.sin_family = AF_INET;
-		server_addr.sin_addr.s_addr = inet_addr(SERVER_IP);
-		server_addr.sin_port = htons(PORT);
-
-		if (bind(server_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
-			perror("bind");
-			close(server_socket);
-			exit(EXIT_FAILURE);
-		}
-
-		if (listen(server_socket, 5) < 0) {
-			perror("listen");
-			close(server_socket);
-			exit(EXIT_FAILURE);
-		}
-
-		std::cout << "Server listening on " << SERVER_IP << ":" << PORT << std::endl;
-
-		while (true) {
-			struct sockaddr_in client_addr;
-			socklen_t client_len = sizeof(client_addr);
-			int client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_len);
-			if (client_socket < 0) {
-				perror("accept");
-				continue;
-			}
-
-			int idx;
-			{
-				std::lock_guard<std::mutex> lock(clientsMutex);
-				clientSockets.push_back(client_socket);
-				idx = clientSockets.size() - 1;
-			}
-
-			std::cout << "Client " << idx << " connected from " << inet_ntoa(client_addr.sin_addr) << ":"
-			          << ntohs(client_addr.sin_port) << std::endl;
-
-			std::thread(recv_func, client_socket, idx).detach();
-		}
-
-		close(server_socket);
-		return 0;
+	server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (server_socket == -1) {
+		perror("socket");
+		exit(EXIT_FAILURE);
 	}
+
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_addr.s_addr = inet_addr(SERVER_IP);
+	server_addr.sin_port = htons(PORT);
+
+	if (bind(server_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+		perror("bind");
+		close(server_socket);
+		exit(EXIT_FAILURE);
+	}
+
+	if (listen(server_socket, 5) < 0) {
+		perror("listen");
+		close(server_socket);
+		exit(EXIT_FAILURE);
+	}
+
+	std::cout << "Server listening on " << SERVER_IP << ":" << PORT << std::endl;
+
+	while (true) {
+		struct sockaddr_in client_addr;
+		socklen_t client_len = sizeof(client_addr);
+		int client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_len);
+		if (client_socket < 0) {
+			perror("accept");
+			continue;
+		}
+
+		int idx;
+		{
+			std::lock_guard<std::mutex> lock(clientsMutex);
+			clientSockets.push_back(client_socket);
+			idx = clientSockets.size() - 1;
+		}
+
+		std::cout << "Client " << idx << " connected from " << inet_ntoa(client_addr.sin_addr) << ":"
+		          << ntohs(client_addr.sin_port) << std::endl;
+
+		std::thread(recv_func, client_socket, idx).detach();
+	}
+
+	close(server_socket);
+	return 0;
 }
