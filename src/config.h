@@ -4,7 +4,7 @@
 
 namespace config {
 	const int PORT = 8080;
-	const char* SERVER_IP = "192.168.179.128";
+	const char* SERVER_IP = "127.0.0.1";
 	const int BUFFER_SIZE = 1024;
 } // namespace config
 #endif // CONFIG_H
