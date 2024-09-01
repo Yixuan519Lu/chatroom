@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 void recv_messages(int client_socket) {
-	char buffer[1024];
+	char buffer[config::BUFFER_SIZE];
 	while (true) {
 		memset(buffer, 0, sizeof(buffer));
 		int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
@@ -30,8 +30,8 @@ int main() {
 	}
 
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(PORT);
-	server_addr.sin_addr.s_addr = inet_addr(SERVER_IP);
+	server_addr.sin_port = htons(config::PORT);
+	server_addr.sin_addr.s_addr = inet_addr(config::SERVER_IP);
 
 	if (connect(client_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
 		std::cerr << "Connection to server failed." << std::endl;
